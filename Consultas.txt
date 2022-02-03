@@ -1,0 +1,226 @@
+----------------------------------------------------------------------------------------------------------------
+-----Consulta 1: Armar un listado donde se detalle por cada unidad académica y año, la cantidad de
+-----residencias y cantidad de plazas ocupadas. Solo mostrar los últimos 5 años.
+----------------------------------------------------------------------------------------------------------------
+
+select ua.id_unidadA ,tabla.anio ,tabla.plazas_ocupadas,tabla.Residencias_Ocupadas
+from(
+(select ua.id_unidadA , EXTRACT (year FROM con.inicio) AS "anio" ,count( ua.id_unidadA) as "plazas_ocupadas" ,Count  (distinct h.id_residencia) as "residencias_ocupadas"
+from unidad_academica ua join carrera c on (ua.id_unidadA=c.id_unidadA)
+	join cursa cu on (c.id_carrera=cu.id_carrera)
+	join estudiante e on (e.dni=cu.dni)
+	join contrato con on (e.dni=con.dni)
+	join habitacion h on (con.codHab=h.codHab)
+	where con.inicio between '01/01/2011' and '31/12/2011'
+	group by ua.id_unidadA ,extract (year from con.inicio)
+	order by (ua.id_unidadA ) asc
+	)
+union
+
+(select ua.id_unidadA , EXTRACT (year FROM con.inicio) AS "anio" ,count( ua.id_unidadA) as "plazas ocupadas" ,Count  (distinct h.id_residencia) as "residencias ocupadas"
+from unidad_academica ua join carrera c on (ua.id_unidadA=c.id_unidadA)
+	join cursa cu on (c.id_carrera=cu.id_carrera)
+	join estudiante e on (e.dni=cu.dni)
+	join contrato con on (e.dni=con.dni)
+	join habitacion h on (con.codHab=h.codHab)
+	where con.inicio between '01/01/2012' and '31/12/2012'
+	group by ua.id_unidadA ,extract (year from con.inicio)
+	order by (ua.id_unidadA ) asc
+	)
+union
+
+(select ua.id_unidadA , EXTRACT (year FROM con.inicio) AS "anio" ,count( ua.id_unidadA) as "plazas ocupadas" ,Count  (distinct h.id_residencia) as "residencias ocupadas"
+from unidad_academica ua join carrera c on (ua.id_unidadA=c.id_unidadA)
+	join cursa cu on (c.id_carrera=cu.id_carrera)
+	join estudiante e on (e.dni=cu.dni)
+	join contrato con on (e.dni=con.dni)
+	join habitacion h on (con.codHab=h.codHab)
+	where con.inicio between '01/01/2013' and '31/12/2013'
+	group by ua.id_unidadA ,extract (year from con.inicio)
+	order by (ua.id_unidadA ) asc
+	)
+union
+
+(select ua.id_unidadA , EXTRACT (year FROM con.inicio) AS "anio" ,count( ua.id_unidadA) as "plazas ocupadas" ,Count  (distinct h.id_residencia) as "residencias ocupadas"
+from unidad_academica ua join carrera c on (ua.id_unidadA=c.id_unidadA)
+	join cursa cu on (c.id_carrera=cu.id_carrera)
+	join estudiante e on (e.dni=cu.dni)
+	join contrato con on (e.dni=con.dni)
+	join habitacion h on (con.codHab=h.codHab)
+	where con.inicio between '01/01/2014' and '31/12/2014'
+	group by ua.id_unidadA ,extract (year from con.inicio)
+	order by (ua.id_unidadA ) asc
+	)
+union
+
+(select ua.id_unidadA , EXTRACT (year FROM con.inicio) AS "anio" ,count( ua.id_unidadA) as "plazas ocupadas" ,Count  (distinct h.id_residencia) as "residencias ocupadas"
+from unidad_academica ua join carrera c on (ua.id_unidadA=c.id_unidadA)
+	join cursa cu on (c.id_carrera=cu.id_carrera)
+	join estudiante e on (e.dni=cu.dni)
+	join contrato con on (e.dni=con.dni)
+	join habitacion h on (con.codHab=h.codHab)
+	where con.inicio between '01/01/2015' and '31/12/2015'
+	group by ua.id_unidadA ,extract (year from con.inicio)
+	order by (ua.id_unidadA ) asc
+	)
+union
+(select ua.id_unidadA , EXTRACT (year FROM con.inicio) AS "anio" ,count( ua.id_unidadA) as "plazas ocupadas" ,Count  (distinct h.id_residencia) as "residencias ocupadas"
+from unidad_academica ua join carrera c on (ua.id_unidadA=c.id_unidadA)
+	join cursa cu on (c.id_carrera=cu.id_carrera)
+	join estudiante e on (e.dni=cu.dni)
+	join contrato con on (e.dni=con.dni)
+	join habitacion h on (con.codHab=h.codHab)
+	where con.inicio between '01/01/2016' and '31/12/2016'
+	group by ua.id_unidadA ,extract (year from con.inicio)
+	order by (ua.id_unidadA )asc
+	) 
+) tabla , unidad_academica ua
+where ua.id_unidadA=tabla.id_unidadA
+order by ua.id_unidadA asc
+
+
+----------------------------------------------------------------------------------------------------------------
+------Consulta 2 : 2- Listar aquellas residencias que poseen todos los servicios existentes.
+----------------------------------------------------------------------------------------------------------------
+
+select r.nombre
+from residencia r join brinda b on (r.id_resi=b.id_residencia)
+group by r.id_resi, r.nombre
+having count (*)= (select count(*) from servicio)
+
+----------------------------------------------------------------------------------------------------------------
+-------Consulta 3:Listar las unidades académicas que tienen mayor cantidad de alumnos becados.
+-------retorna 11
+----------------------------------------------------------------------------------------------------------------
+
+select b.nombre_uni
+from beca b 
+where b.nombre_uni is not null
+group by b.nombre_uni
+HAVING COUNT (b.nombre_uni)>= ALL (select COUNT (*) 
+			from beca b 
+			where b.nombre_uni is not null
+			group by b.nombre_uni)
+			
+----------------------------------------------------------------------------------------------------------------			
+------Consulta 4:Por cada residencia mostrar la cantidad de vacantes que posee (plazas libres) en el año
+------en curso.
+----------------------------------------------------------------------------------------------------------------
+
+select r.id_resi, sum(h.plazas_libres)
+ from residencia r join habitacion h on (h.id_residencia=r.id_resi)
+ group by (r.id_resi)
+ order by r.id_resi ASC
+
+----------------------------------------------------------------------------------------------------------------
+-----Consulta 5:Mostrar un listado con los alumnos que tienen contratos que se vencen en dos meses.
+----------------------------------------------------------------------------------------------------------------
+
+select distinct e.nombre ,e.apellido
+from contrato c join estudiante e on (c.dni=e.dni)
+where  c.finalizacion between '1/08/16' and '31/08/2016'
+
+----------------------------------------------------------------------------------------------------------------
+-----Consulta 6: Listar aquellos alumnos que se han visto beneficiados en concepto de becas por montos 
+-----mayores al promedio (considerar toda la información cargada en la db).
+----------------------------------------------------------------------------------------------------------------
+
+(Select e.dni
+from beca b
+JOIN estudiante e on(e.dni = b.dni)
+join institucion i on(i.nombre_insti = b.nombre_insti)
+JOIN contrato c on(c.dni = e.dni)
+group by e.dni
+having SUM((b.porcentaje*c.monto)/100) >= all(
+		Select avg((b.porcentaje*c.monto)/100)
+		from beca b
+		JOIN estudiante e on(e.dni = b.dni)
+		join institucion i on(i.nombre_insti = b.nombre_insti)
+		JOIN contrato c on(c.dni = e.dni)
+		group by e.dni 
+		
+	))
+union 
+(Select e.dni
+from beca b
+JOIN estudiante e on(e.dni = b.dni)
+join unidad_academica i on(i.id_unidada = b.nombre_uni)
+JOIN contrato c on(c.dni = e.dni)
+group by e.dni
+having SUM((b.porcentaje*c.monto)/100) >= all(
+		Select avg((b.porcentaje*c.monto)/100)
+		from beca b
+		JOIN estudiante e on(e.dni = b.dni)
+		join unidad_academica i on(i.id_unidada = b.nombre_uni)
+		JOIN contrato c on(c.dni = e.dni)
+		group by e.dni 
+		
+	))order by 1 desc
+
+----------------------------------------------------------------------------------------------------------------
+-----Consulta 7:Listar por cada entidad otorgante de becas el total de dinero comprometido; es decir la 
+-----sumatoria de los montos que deberán pagar para terminar los contratos vigentes de los que participan.
+----------------------------------------------------------------------------------------------------------------
+
+(Select i.nombre_insti, sum(c.monto)
+from beca b
+JOIN estudiante e on(e.dni = b.dni)
+join institucion i on(i.nombre_insti = b.nombre_insti)
+JOIN contrato c on(c.dni = e.dni)
+group by i.nombre_insti
+)
+union 
+(Select i.nombre, sum(c.monto)
+from beca b
+JOIN estudiante e on(e.dni = b.dni)
+join unidad_academica i on(i.id_unidada = b.nombre_uni)
+JOIN contrato c on(c.dni = e.dni)
+group by i.id_unidada
+)order by 1 desc 
+
+
+----------------------------------------------------------------------------------------------------------------
+-----Consulta 8: Detallar la entidad que mayor aporte a realizado mediante becas 
+-----(considerar toda la historia guardada).
+----------------------------------------------------------------------------------------------------------------
+
+(Select i.nombre_insti
+from beca b
+JOIN estudiante e on(e.dni = b.dni)
+join institucion i on(i.nombre_insti = b.nombre_insti)
+JOIN contrato c on(c.dni = e.dni)
+group by i.nombre_insti
+having SUM((b.porcentaje*c.monto)/100) >= all(
+		Select SUM((b.porcentaje*c.monto)/100)
+		from beca b
+		JOIN estudiante e on(e.dni = b.dni)
+		join institucion i on(i.nombre_insti = b.nombre_insti)
+		JOIN contrato c on(c.dni = e.dni)
+		group by i.nombre_insti 
+		
+	))
+union 
+(Select i.nombre
+from beca b
+JOIN estudiante e on(e.dni = b.dni)
+join unidad_academica i on(i.id_unidada = b.nombre_uni)
+JOIN contrato c on(c.dni = e.dni)
+group by i.id_unidada
+having SUM((b.porcentaje*c.monto)/100) >= all(
+		Select SUM((b.porcentaje*c.monto)/100)
+		from beca b
+		JOIN estudiante e on(e.dni = b.dni)
+		join unidad_academica i on(i.id_unidada = b.nombre_uni)
+		JOIN contrato c on(c.dni = e.dni)
+		group by i.id_unidada 
+		
+	))order by 1 desc limit 1
+
+----------------------------------------------------------------------------------------------------------------
+------Consulta 9: Listar los alumnos que nunca recibieron becas
+----------------------------------------------------------------------------------------------------------------
+
+Select e.dni
+from estudiante e
+except (select distinct b.dni 
+	from beca b)
